@@ -85,7 +85,7 @@ def copy_hot_songs_ssh():
         copied_count = 0
         skipped_count = 0
 
-        for item in tqdm(to_copy, desc="Copying on NAS"):
+        for item in tqdm(to_copy, desc="Moving on NAS"):
             source_path = f"{NAS_SOURCE_DIR}/{item}"
             target_path = f"{NAS_TARGET_DIR}/{item}"
             
@@ -99,9 +99,10 @@ def copy_hot_songs_ssh():
                 skipped_count += 1
                 continue
 
-            # Construct copy command (cp -r)
-            # Using -r for recursive.
-            cmd = f"cp -r '{source_path}' '{NAS_TARGET_DIR}/'"
+            # Construct move command (mv)
+            # Using -n to no-clobber is standard for mv to avoid overwrite if exists, but we already checked existence.
+            # mv source target_dir/
+            cmd = f"mv '{source_path}' '{NAS_TARGET_DIR}/'"
             
             stdin, stdout, stderr = ssh.exec_command(cmd)
             exit_status = stdout.channel.recv_exit_status()
@@ -110,7 +111,7 @@ def copy_hot_songs_ssh():
                 copied_count += 1
             else:
                 err = stderr.read().decode()
-                print(f"Error copying {item}: {err}") 
+                print(f"Error moving {item}: {err}") 
                 # skipped_count += 1 # Already counted in skipped or failed? Let's track failures separately if needed but count is simple here.
 
 

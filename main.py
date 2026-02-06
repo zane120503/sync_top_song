@@ -41,7 +41,8 @@ def get_top_songs(limit: int = 200000):
         public.tracking AS t
     WHERE 
         t."event" = 'event_play_song'
-        AND (t.metadata ->> 'songId') !~ '^[0-9]+$' -- Chỉ lấy ID chứa chữ/ký tự, bỏ ID toàn số
+        AND t.created_time >= NOW() - INTERVAL '1 month'
+        AND (t.metadata ->> 'songId') !~ '^[0-9]+$'
     GROUP BY 
         t.metadata ->> 'songId', 
         t.metadata ->> 'songName'
